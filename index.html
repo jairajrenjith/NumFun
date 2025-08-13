@@ -2,33 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NumFun</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
-body {margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#050d1a;color:#0ff;font-family:'Orbitron',sans-serif}
+* {box-sizing:border-box}
+body {margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#050d1a;color:#0ff;font-family:'Orbitron',sans-serif}
 .container {text-align:center;width:90%;max-width:400px}
-input {width:100%;padding:12px;font-size:1.2rem;background:transparent;border:2px solid #0ff;color:#0ff;outline:none;text-align:center;border-radius:10px;box-shadow:0 0 15px #0ff;transition:0.3s}
+h1 {margin-bottom:20px;font-size:2rem}
+input {width:100%;padding:14px;font-size:1.3rem;background:transparent;border:2px solid #0ff;color:#0ff;outline:none;text-align:center;border-radius:10px;box-shadow:0 0 15px #0ff;transition:0.3s}
 input:focus {box-shadow:0 0 25px #0ff}
-.result {margin-top:30px;font-size:2.5rem;font-weight:700;color:#0ff;text-shadow:0 0 20px #0ff;transition:all 0.3s ease-in-out}
+.result {margin-top:25px;font-size:2.5rem;font-weight:700;color:#0ff;text-shadow:0 0 20px #0ff;transition:all 0.3s ease-in-out;word-wrap:break-word}
 .result.glow {text-shadow:0 0 30px #0ff,0 0 60px #0ff,0 0 90px #0ff}
-@media (max-width:600px){.result{font-size:2rem}}
+@media (max-width:600px){
+    h1 {font-size:1.8rem}
+    .result {font-size:2rem}
+    input {font-size:1.1rem;padding:12px}
+}
 </style>
 </head>
 <body>
 <div class="container">
 <h1>NumFun</h1>
-<input id="numInput" type="text" placeholder="Enter digits">
+<input id="numInput" type="tel" placeholder="Enter digits">
 <div class="result" id="result">%</div>
 </div>
 <script>
-function calcPercent(n){if(!n)return 0;let sum=0;for(let i=0;i<n.length;i++)sum+=parseInt(n[i])*(i+1);let seed=(sum*Math.sqrt(sum*999))%10000;return (seed/100).toFixed(2);}
+function calcPercent(n){if(!n)return "0.00";let sum=0;for(let i=0;i<n.length;i++){if(!isNaN(n[i]))sum+=parseInt(n[i])*(i+1);}let seed=(sum*Math.sqrt(sum*999))%10000;return (seed/100).toFixed(2);}
 let res=document.getElementById('result');
 document.getElementById('numInput').addEventListener('input',function(){
     res.textContent=calcPercent(this.value)+'%';
     res.classList.add('glow');
-    setTimeout(()=>res.classList.remove('glow'),200);
-})
+    clearTimeout(res._glowTimeout);
+    res._glowTimeout=setTimeout(()=>res.classList.remove('glow'),200);
+});
 </script>
 </body>
 </html>
