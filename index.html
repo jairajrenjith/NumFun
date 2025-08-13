@@ -1,279 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>DigitFlux</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NumFun</title>
 <style>
-  /* Futuristic neon + glass look, no external fonts (offline) */
-  :root{
-    --bg1:#05070f; --bg2:#000105;
-    --neon:#00fff7; --neon2:#00b7ff; --text:#bffcff; --muted:#7fe8f0;
-    --card: rgba(0, 255, 247, 0.06);
-    --card-border: rgba(0, 255, 247, 0.32);
-    --card-inset: rgba(0, 255, 247, 0.08);
-  }
-  * { box-sizing: border-box }
-  html,body { height: 100% }
-  body{
-    margin:0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    color: var(--text);
-    background: radial-gradient(1200px 600px at 50% -10%, var(--bg1), var(--bg2));
-    display:flex; align-items:center; justify-content:center; padding:2rem;
-  }
-  .frame{
-    width:min(680px, 100%);
-    position:relative;
-  }
-  .scanline{
-    position:absolute; inset:0; pointer-events:none; overflow:hidden;
-  }
-  .scanline::before{
-    content:""; position:absolute; left:0; right:0; height:2px; top:-2px;
-    background: linear-gradient(90deg, transparent, var(--neon), transparent);
-    filter: blur(1px); opacity:.35; animation: scan 3.4s linear infinite;
-  }
-  @keyframes scan { 0%{top:-2px} 100%{top:calc(100% + 2px)} }
-
-  .card{
-    backdrop-filter: blur(16px);
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    box-shadow:
-      0 0 24px rgba(0,255,247,.15),
-      inset 0 0 60px var(--card-inset);
-    border-radius: 18px;
-    padding: 22px;
-    position:relative;
-    overflow:hidden;
-  }
-  .card::after{
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background: conic-gradient(from 180deg at 80% -10%, rgba(0,183,255,.18), transparent 30%),
-                radial-gradient(500px 140px at -20% 0%, rgba(0,255,247,.12), transparent 60%);
-    mix-blend-mode: screen;
-  }
-  h1{
-    margin:0 0 6px; font-size: clamp(20px, 3.5vw, 28px);
-    color: var(--neon); text-shadow: 0 0 12px rgba(0,255,247,.6);
-    letter-spacing:.5px;
-  }
-  .subtitle{
-    margin:0 0 16px; color: var(--muted); font-size: .92rem;
-  }
-  .row{ display:flex; gap:10px; align-items:center; }
-  input[type="text"]{
-    flex:1; padding:.85rem .9rem; border-radius:10px;
-    border:1px solid rgba(0,255,247,.28);
-    background: rgba(0,0,0,.35); color:var(--text);
-    outline:none; letter-spacing:.6px; font-size:1rem;
-    box-shadow: inset 0 0 18px rgba(0,255,247,.06);
-  }
-  input[type="text"]::placeholder{ color:#79dfe6 }
-  button{
-    padding:.8rem 1.05rem; border-radius:10px; border:none; cursor:pointer;
-    background: linear-gradient(90deg, var(--neon), var(--neon2));
-    color:#001014; font-weight:700; letter-spacing:.4px;
-    box-shadow: 0 0 18px rgba(0,255,247,.35);
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  button:hover{ transform: translateY(-1px); box-shadow:0 0 24px rgba(0,255,247,.5) }
-  button:active{ transform: translateY(0) }
-
-  .meta{
-    display:flex; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap;
-  }
-  .badge{
-    font-size:.72rem; padding:.18rem .5rem; border-radius:999px;
-    border:1px solid rgba(0,255,247,.35); background: rgba(0,255,247,.12); color:var(--neon);
-  }
-  .hint{ font-size:.75rem; color:#90f6ff }
-  .result{
-    margin-top:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-  }
-  .percent{
-    font-size: clamp(28px, 6vw, 48px); font-weight:900; line-height:1;
-    color: var(--neon); text-shadow: 0 0 18px rgba(0,255,247,.7);
-  }
-  .copy{
-    border:1px dashed rgba(0,255,247,.35); background: rgba(0,0,0,.35); color:var(--text);
-    padding:.45rem .65rem; border-radius:8px; cursor:pointer; font-size:.8rem;
-  }
-
-  details{
-    margin-top:14px; border:1px solid rgba(0,255,247,.22);
-    background: rgba(0,255,247,.05); border-radius:12px; overflow:hidden;
-  }
-  details summary{
-    padding:.7rem .9rem; cursor:pointer; color:#bffcff; user-select:none;
-  }
-  pre{
-    margin:0; padding: .75rem .9rem; white-space: pre-wrap; color:#d3ffff;
-    background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.35));
-    border-top:1px solid rgba(0,255,247,.18);
-    font-size:.88rem;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+body {margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#050d1a;color:#0ff;font-family:'Orbitron',sans-serif}
+.container {text-align:center;width:90%;max-width:400px}
+input {width:100%;padding:12px;font-size:1.2rem;background:transparent;border:2px solid #0ff;color:#0ff;outline:none;text-align:center;border-radius:10px;box-shadow:0 0 15px #0ff;transition:0.3s}
+input:focus {box-shadow:0 0 25px #0ff}
+.result {margin-top:30px;font-size:2.5rem;font-weight:700;color:#0ff;text-shadow:0 0 20px #0ff;transition:all 0.3s ease-in-out}
+.result.glow {text-shadow:0 0 30px #0ff,0 0 60px #0ff,0 0 90px #0ff}
+@media (max-width:600px){.result{font-size:2rem}}
 </style>
 </head>
 <body>
-  <div class="frame">
-    <div class="scanline"></div>
-    <div class="card" role="region" aria-label="DigitFlux card">
-      <h1>DigitFlux</h1>
-      <p class="subtitle">Deterministic percentifier for any-length digits — no AI, no network.</p>
-
-      <div class="row">
-        <input id="digitInput" type="text" placeholder="Type or paste digits…" inputmode="numeric" autocomplete="off" />
-        <button id="computeBtn" aria-label="Compute percentage">Compute</button>
-      </div>
-
-      <div class="meta">
-        <span class="badge">Deterministic</span>
-        <span class="badge">Surjective 0.00–100.00</span>
-        <span class="hint" id="hint" hidden>Non-digits ignored.</span>
-      </div>
-
-      <div class="result">
-        <div id="percent" class="percent">0.00%</div>
-        <button class="copy" id="copyBtn" title="Copy percentage">Copy</button>
-      </div>
-
-      <details>
-        <summary>How it was computed</summary>
-        <pre id="breakdown">Awaiting input…</pre>
-      </details>
-    </div>
-  </div>
-
+<div class="container">
+<h1>NumFun</h1>
+<input id="numInput" type="text" placeholder="Enter digits">
+<div class="result" id="result">%</div>
+</div>
 <script>
-/* --------------- core deterministic logic (surjective to 0.00–100.00) --------------- */
-const MASK64 = (1n<<64n)-1n;
-function mix(x){
-  x ^= (x << 13n) & MASK64;
-  x ^= x >> 7n;
-  x ^= (x << 17n) & MASK64;
-  return x & MASK64;
-}
-
-function computePercent(raw){
-  // keep digits only; note if we dropped anything
-  const hadNonDigits = /[^0-9]/.test(raw);
-  const digits = [...raw].filter(c => c >= '0' && c <= '9').map(c => c.charCodeAt(0) - 48);
-
-  if (digits.length === 0) {
-    return {
-      percent: "0.00",
-      breakdown: { note: "No digits provided" },
-      hadNonDigits
-    };
-  }
-
-  const n = digits.length;
-  const sumDigits = digits.reduce((a,b)=>a+b,0);
-  const sumSquares = digits.reduce((a,b)=>a+b*b,0);
-  const altSum = digits.reduce((a,b,i)=>a + (i%2===0 ? b : -b), 0);
-
-  let runs = 1;
-  for (let i=1;i<n;i++) if (digits[i] !== digits[i-1]) runs++;
-
-  const distinct = new Set(digits).size;
-  const ends25 = (raw.endsWith("25") ? 1 : 0);
-  const primeSet = new Set([2,3,5,7]);
-  const primeCount = digits.filter(d => primeSet.has(d)).length;
-
-  // pairs that sum to 10 (using freq array for O(1) bucket pairs)
-  let pairs10 = 0;
-  const freq = Array(10).fill(0);
-  for (const d of digits) freq[d]++;
-  for (let i=0;i<=5;i++){
-    if (i === 10 - i) pairs10 += Math.floor(freq[i]*(freq[i]-1)/2);
-    else if (i < 10-i) pairs10 += freq[i]*freq[10-i];
-  }
-
-  // rolling polynomial hash in base 131 modulo 2^64 (via BigInt wrap)
-  let roll = 0n, base = 131n;
-  for (const d of digits) roll = (roll * base + BigInt(d)) & MASK64;
-
-  // weighted prime sum (cycle first 10 primes)
-  const W = [2,3,5,7,11,13,17,19,23,29];
-  let wsum = 0;
-  for (let i=0;i<n;i++) wsum += digits[i] * W[i%10];
-
-  // Luhn-like checksum from right
-  let luhn = 0;
-  for (let r=0;r<n;r++){
-    let v = digits[n-1-r];
-    if (r%2===1){ v *= 2; if (v > 9) v -= 9; }
-    luhn += v;
-  }
-
-  // combine into 64-bit value and scramble
-  let a = roll;
-  let b = BigInt(
-    sumDigits + 3*sumSquares + 11*distinct + 37*runs + 97*primeCount +
-    101*pairs10 + 251*ends25 + 13*Math.abs(altSum) + 17*wsum + 19*luhn
-  );
-  a = mix(a) ^ mix(b);
-  a = (a * 11400714819323198485n) & MASK64; // multiplicative avalanche
-
-  // surjective map to [0.00, 100.00] with 2 decimals via mod 10001
-  const r = Number(a % 10001n);          // integer 0..10000
-  const percent = (r/100).toFixed(2);    // "XY.ZZ"
-
-  const breakdown = {
-    n, sumDigits, sumSquares, altSum, runs, distinct, ends25, primeCount, pairs10,
-    roll_hex: roll.toString(16).padStart(16,"0"),
-    wsum, luhn,
-    mixed_hex: a.toString(16).padStart(16,"0"),
-    r, percent
-  };
-  return { percent, breakdown, hadNonDigits };
-}
-
-/* --------------- UI wiring --------------- */
-const inputEl = document.getElementById('digitInput');
-const btn = document.getElementById('computeBtn');
-const out = document.getElementById('percent');
-const pre = document.getElementById('breakdown');
-const hint = document.getElementById('hint');
-const copyBtn = document.getElementById('copyBtn');
-
-function render(res){
-  out.textContent = res.percent + "%";
-  pre.textContent = JSON.stringify(res.breakdown, null, 2);
-  hint.hidden = !res.hadNonDigits;
-}
-
-function run(){
-  btn.disabled = true;
-  try {
-    const res = computePercent(inputEl.value);
-    render(res);
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-btn.addEventListener('click', run);
-inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ run(); } });
-// Live compute on input (optional but nice): compute only if length changes or input non-empty
-let lastVal = "";
-inputEl.addEventListener('input', ()=>{
-  const v = inputEl.value;
-  if (v !== lastVal && v.length > 0){ run(); lastVal = v; }
-});
-
-copyBtn.addEventListener('click', async ()=>{
-  try{
-    await navigator.clipboard.writeText(out.textContent);
-    copyBtn.textContent = "Copied";
-    setTimeout(()=>copyBtn.textContent="Copy", 900);
-  }catch{
-    copyBtn.textContent = "Copy failed";
-    setTimeout(()=>copyBtn.textContent="Copy", 900);
-  }
-});
+function calcPercent(n){if(!n)return 0;let sum=0;for(let i=0;i<n.length;i++)sum+=parseInt(n[i])*(i+1);let seed=(sum*Math.sqrt(sum*999))%10000;return (seed/100).toFixed(2);}
+let res=document.getElementById('result');
+document.getElementById('numInput').addEventListener('input',function(){
+    res.textContent=calcPercent(this.value)+'%';
+    res.classList.add('glow');
+    setTimeout(()=>res.classList.remove('glow'),200);
+})
 </script>
 </body>
 </html>
