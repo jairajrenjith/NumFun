@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Digit Alchemy: Futuristic Percentifier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Share Tech Mono', monospace;
+    background: radial-gradient(circle at top, #0a0f1f, #000);
+    color: #00fff7;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  .card {
+    backdrop-filter: blur(15px);
+    background: rgba(0, 255, 247, 0.05);
+    border: 1px solid rgba(0, 255, 247, 0.3);
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0,255,247,0.2), inset 0 0 40px rgba(0,255,247,0.05);
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    animation: fadeIn 0.8s ease;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px #00fff7;
+  }
+  p.subtitle {
+    margin: 0.3rem 0 1.2rem;
+    font-size: 0.9rem;
+    color: #80fff9;
+  }
+  input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0, 255, 247, 0.3);
+    border-radius: 0.5rem;
+    color: #00fff7;
+    outline: none;
+    margin-bottom: 0.8rem;
+    letter-spacing: 1px;
+  }
+  button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, #00fff7, #00b7ff);
+    color: #000;
+    cursor: pointer;
+    margin-right: 0.3rem;
+    transition: transform 0.15s ease;
+  }
+  button:hover { transform: scale(1.05); }
+  .percent {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    text-shadow: 0 0 15px #00fff7;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(0, 255, 247, 0.2);
+    color: #00fff7;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.3rem;
+    margin-top: 0.6rem;
+    border: 1px solid rgba(0,255,247,0.4);
+  }
+  details {
+    margin-top: 1rem;
+    background: rgba(0, 255, 247, 0.05);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0,255,247,0.2);
+    font-size: 0.85rem;
+    color: #80fff9;
+  }
+  details summary {
+    cursor: pointer;
+  }
+  pre {
+    white-space: pre-wrap;
+    color: #a0fff9;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Digit Alchemy</h1>
+  <p class="subtitle">Futuristic deterministic % calculator</p>
+  <input id="digitInput" placeholder="Enter digits..." inputmode="numeric" autocomplete="off">
+  <div>
+    <button id="computeBtn">Compute %</button>
+    <button id="randomBtn">Random Demo</button>
+  </div>
+  <div style="margin-top:0.6rem;">
+    <button class="preset">48215382425</button>
+    <button class="preset">25</button>
+    <button class="preset">9999999999</button>
+  </div>
+  <div class="percent" id="result">0.00%</div>
+  <div class="badge">Deterministic • No AI</div>
+  <details>
+    <summary>How it was computed</summary>
+    <pre id="breakdown"></pre>
+  </details>
+</div>
+
+<script>
+function mix(x) {
+  x ^= (x << 13n) & ((1n<<64n)-1n);
+  x ^= x >> 7n;
+  x ^= (x << 17n) & ((1n<<64n)-1n);
+  return x & ((1n<<64n)-1n);
+}
+
+function computePercent(str) {
+  let digits = [...str].filter(ch => /\d/.test(ch)).map(Number);
+  let breakdown = {};
+  if (digits.length === 0) return { percent: "0.00", breakdown: { note: "No digits provided" } };
+
+  const n = digits.length;
+  const sumDigits = digits.reduce((a,b)=>a+b,0);
+  const sumSquares = digits.reduce((a,b)=>a+b*b,0);
+  const altSum = digits.reduce((a,b,i)=>a+ (i%2===0?b:-b),0);
+  let runs = 1;
+  for (let i=1;i<n;i++) if (digits[i]!==digits[i-1]) runs++;
+  const distinct = new Set(digits).size;
+  const ends25 = str.endsWith("25") ? 1 : 0;
+  const primeSet = new Set([2,3,5,7]);
+  const primeCount = digits.filter(d=>primeSet.has(d)).length;
+  let pairs10 = 0;
+  let freq = Array(10).fill(0);
+  for (let d of digits) freq[d]++;
+  for (let i=0;i<=5;i++) {
+    if (i===10-i) pairs10 += freq[i]*(freq[i]-1)/2;
+    else if (i<10-i) pairs10 += freq[i]*freq[10-i];
+  }
+
+  // rolling hash
+  let roll = 0n;
+  const base = 131n;
+  for (let d of digits) roll = (roll * base + BigInt(d)) & ((1n<<64n)-1n);
+
+  // weighted sum
+  const W = [2,3,5,7,11,13,17,19,23,29];
+  let wsum = 0;
+  for (let i=0;i<n;i++) wsum += digits[i] * W[i%10];
+
+  // Luhn checksum
+  let luhn = 0;
+  for (let r=0;r<n;r++) {
+    let v = digits[n-1-r];
+    if (r%2===1) { v*=2; if (v>9) v-=9; }
+    luhn += v;
+  }
+
+  // combine
+  let a = roll;
+  let b = BigInt(sumDigits + 3*sumSquares + 11*distinct + 37*runs + 97*primeCount +
+                 101*pairs10 + 251*ends25 + 13*Math.abs(altSum) + 17*wsum + 19*luhn);
+  a = mix(a) ^ mix(b);
+  a = (a * 11400714819323198485n) & ((1n<<64n)-1n);
+
+  const r = Number(a % 10001n); // 0..10000
+  const percent = (r/100).toFixed(2);
+
+  breakdown = {n, sumDigits, sumSquares, altSum, runs, distinct, ends25, primeCount,
+               pairs10, roll: roll.toString(16).padStart(16,"0"), wsum, luhn,
+               mixedA: a.toString(16).padStart(16,"0"), r, percent};
+  return { percent, breakdown };
+}
+
+function showResult({percent, breakdown}) {
+  document.getElementById("result").textContent = percent + "%";
+  document.getElementById("breakdown").textContent = JSON.stringify(breakdown,null,2);
+}
+
+document.getElementById("computeBtn").onclick = () => {
+  const str = document.getElementById("digitInput").value;
+  showResult(computePercent(str));
+};
+
+document.getElementById("randomBtn").onclick = () => {
+  const len = Math.floor(Math.random()*36)+5;
+  let s = "";
+  for (let i=0;i<len;i++) s += Math.floor(Math.random()*10);
+  document.getElementById("digitInput").value = s;
+  showResult(computePercent(s));
+};
+
+document.querySelectorAll(".preset").forEach(btn=>{
+  btn.onclick = () => {
+    document.getElementById("digitInput").value = btn.textContent;
+    showResult(computePercent(btn.textContent));
+  };
+});
+</script>
+
+</body>
+  </html>
